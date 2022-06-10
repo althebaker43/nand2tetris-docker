@@ -19,9 +19,13 @@ RUN adduser --disabled-password $user
 USER $user
 WORKDIR /home/$user
 
-# Unzip nand2tetris
+# Unzip nand2tetris tools
 COPY --chown=$user nand2tetris.zip .
-RUN unzip nand2tetris.zip && rm nand2tetris.zip && chmod +x nand2tetris/tools/*.sh
+RUN unzip nand2tetris.zip && \
+    rm nand2tetris.zip && \
+    chmod +x nand2tetris/tools/*.sh && \
+    mv nand2tetris/tools . && \
+    rm -r nand2tetris
 
 # Copy emacs config to home
 COPY --chown=$user .emacs .
