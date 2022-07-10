@@ -8,5 +8,29 @@
 //
 // This program only needs to handle arguments that satisfy
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
-
-// Put your code here.
+	// Put your code here.
+	@0
+	D=A
+	@2
+	M=D
+	@0
+	D=M
+	@END
+	D;JEQ
+	@3
+	M=D
+	@0
+	D=A
+(LOOP)
+	@2
+	D=M
+	@1
+	D=D+M
+	@2
+	M=D
+	@3
+	M=M-1
+	D=M
+	@LOOP
+	D;JGT
+(END)
