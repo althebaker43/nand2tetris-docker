@@ -1,0 +1,88 @@
+
+class PongGame {
+    field Rectangle p1;
+    field Rectangle p2;
+    field Square ball;
+    field boolean ballRight;
+    field boolean ballUp;
+
+    constructor PongGame new() {
+        let p1 = Rectangle.new(0, 0, 60, 20);
+        let p2 = Rectangle.new(491, 0, 60, 20);
+	let ball = Square.new(241, 113, 30);
+	let ballRight = true;
+	let ballUp = true;
+        return this;
+    }
+
+    method void dispose() {
+        do p1.dispose();
+        do p2.dispose();
+	do ball.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void run() {
+        var char key;
+        var boolean exit;
+        let exit = false;
+
+        while (~exit) {
+
+            let key = Keyboard.keyPressed();
+            // while (key = 0) {
+            //     let key = Keyboard.keyPressed();
+            // }
+            if (key = 81) { let exit = true; }
+            if (key = 65) {
+                do p1.moveUp();
+            }
+            if (key = 90) {
+                do p1.moveDown();
+            }
+            if (key = 39) {
+                do p2.moveUp();
+            }
+            if (key = 47) {
+                do p2.moveDown();
+            }
+
+	    if (ball.atBottom()) {
+		let ballUp = true;
+	    }
+	    if (ball.atTop()) {
+		let ballUp = false;
+	    }
+
+	    if (ball.contact(p1)) {
+		let ballRight = true;
+	    }
+	    if (ball.contact(p2)) {
+		let ballRight = false;
+	    }
+
+	    if (ball.atRight() | ball.atLeft()) {
+		let exit = true;
+	    }
+	    else {
+		if (ballUp) {
+		    do ball.moveUp();
+		}
+		else {
+		    do ball.moveDown();
+		}
+
+		if (ballRight) {
+		    do ball.moveRight();
+		}
+		else {
+		    do ball.moveLeft();
+		}
+	    }
+
+            do Sys.wait(5);
+        }
+        return;
+    }
+}
