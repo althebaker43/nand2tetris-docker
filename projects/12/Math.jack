@@ -10,6 +10,7 @@
 class Math {
 
     static Array pow2;
+    static int divTestX;
 
     /** Initializes the library. */
     function void init() {
@@ -36,7 +37,7 @@ class Math {
     /** Returns the absolute value of x. */
     function int abs(int x) {
         if (x < 0) {
-            return (~x) + 1;
+            return -x;
         }
         return x;
     }
@@ -107,21 +108,100 @@ class Math {
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
-        return 0;
+
+        var int absX, absY;
+        var int q;
+
+        if (x = 0) {
+            return 0;
+        }
+
+        if (y = 0) {
+            return 0;
+        }
+
+        let absX = Math.abs(x);
+        let absY = Math.abs(y);
+
+        let q = Math.divideRec(absX, absY);
+
+        if (((x < 0) & (y > 0)) | ((x > 0) & (y < 0))) {
+            let q = -q;
+        }
+        
+        return q;
+    }
+
+    function int divideRec(int x, int y) {
+
+        var int q;
+
+        // Check if y is greater than x or if y overflows
+        if ((y > x) | (y < 0)) {
+            let divTestX = 0;
+            return 0;
+        }
+
+        let q = Math.divideRec(x, (y + y));
+
+        if (q & 1) {
+            let divTestX = divTestX + (y + y);
+        }
+
+        if ((x - divTestX) < y) {
+            return (q + q);
+        }
+        else {
+            return ((q + q) + 1);
+        }
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
-        return 0;
+
+        var int y;
+        var int testY, testYSqr;
+        var int i;
+
+        let y = 0;
+        let testY = 0;
+        let testYSqr = 0;
+        let i = 7;
+
+        while ((i > 0) | (i = 0)) {
+
+            let testY = y + pow2[i];
+            let testYSqr = testY * testY;
+
+            if ((testYSqr > 0) & ((testYSqr = x) | (testYSqr < x))) {
+                let y = testY;
+            }
+
+            let i = i - 1;
+        }
+
+        return y;
     }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
-        return 0;
+
+        if (a > b) {
+            return a;
+        }
+        else {
+            return b;
+        }
     }
 
     /** Returns the smaller number. */
     function int min(int a, int b) {
-        return 0;
+
+        if (a < b) {
+            return a;
+        }
+        else {
+            return b;
+        }
     }
 }
