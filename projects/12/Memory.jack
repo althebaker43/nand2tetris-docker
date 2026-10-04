@@ -10,25 +10,191 @@
  */ 
 class Memory {
 
+    static Array memArr;
+    static int freeHead;
+
     /** Initializes the class. */
     function void init() {
+
+        let memArr = 0;
+        let freeHead = 2048;
+
+        do Memory.poke(freeHead, 14335);
+        do Memory.poke(freeHead+1, 0);
+
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return memArr[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let memArr[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+
+        var int newAddr;
+        var int prevBlock;
+        var int curBlock;
+        var int curSize;
+        var int newAddr;
+
+        let prevBlock = 0;
+        let curBlock = freeHead;
+        let curSize = 0;
+        let newAddr = 0;
+
+        // First-fit allocation
+
+        while ((~(curBlock = 0)) & (newAddr = 0)) {
+
+            let curSize = Memory.peek(curBlock);
+
+            if (curSize > size) {
+
+                let newAddr = curBlock + 1;
+                do Memory.poke(curBlock, size);
+
+                if ((curSize - (size + 1)) < 2) {
+
+                    // Remove block from free list
+                    if (~(prevBlock = 0)) {
+
+                        do Memory.poke(prevBlock+1, Memory.peek(curBlock+1));
+                    }
+                    else {
+
+                        let freeHead = Memory.peek(curBlock+1);
+                    }
+                }
+                else {
+
+                    // Reduce free block size
+                    do Memory.poke((curBlock+size+1), (curSize-size-1));
+                    do Memory.poke((curBlock+size+2), Memory.peek(curBlock+1));
+
+                    if (~(prevBlock = 0)) {
+
+                        do Memory.poke(prevBlock+1, curBlock+size+1);
+                    }
+                    else {
+
+                        let freeHead = curBlock+size+1;
+                    }
+                }
+            }
+            else {
+
+                let prevBlock = curBlock;
+                let curBlock = Memory.peek(curBlock + 1);
+            }
+        }
+
+        return newAddr;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+
+        // do Memory.poke(o, freeHead);
+        // let freeHead = o - 1;
+
+        var int prevBlock;
+        var int prevSize;
+        var int curBlock;
+        var int curSize;
+        var int nextBlock;
+        var int listUpdated;
+
+        let curBlock = freeHead;
+        let curSize = 0;
+        let prevBlock = 0;
+        let prevSize = 0;
+        let nextBlock = 0;
+        let listUpdated = 0;
+
+        while ((~(curBlock = 0)) & (listUpdated = 0)) {
+
+            let curSize = Memory.peek(curBlock);
+
+            if (curBlock > o) {
+
+                let nextBlock = curBlock;
+
+                if (~(prevBlock = 0)) {
+    
+                    do Memory.poke(o, Memory.peek(prevBlock+1));
+                    do Memory.poke(prevBlock+1, o-1);
+                }
+                else {
+
+                    do Memory.poke(o, freeHead);
+                    let freeHead = o - 1;
+                }
+
+                let listUpdated = 1;
+            }
+            else {
+
+                let prevBlock = curBlock;
+                let prevSize = curSize;
+                let curBlock = Memory.peek(curBlock+1);
+            }
+        }
+
+        if (listUpdated = 0) {
+
+            if (prevBlock = 0) {
+
+                do Memory.poke(o, freeHead);
+                let freeHead = o - 1;
+            }
+            else {
+    
+                do Memory.poke(o, prevBlock+1);
+                do Memory.poke(prevBlock+1, o-1);
+            }
+        }
+
+        // Defragment
+
+        let curBlock = o - 1;
+        let curSize = Memory.peek(curBlock);
+
+        // Check previous block
+        if (~(prevBlock = 0)) {
+
+            if ((prevBlock + prevSize + 1) = curBlock) {
+
+                let curSize = prevSize + curSize + 1;
+
+                do Memory.poke(prevBlock, curSize);
+                do Memory.poke(prevBlock+1, Memory.peek(curBlock+1));
+
+                let curBlock = prevBlock;
+            }
+        }
+
+        // Check next block
+        if (~(nextBlock = 0)) {
+
+            if ((curBlock + curSize + 1) = nextBlock) {
+
+                let curSize = curSize + Memory.peek(nextBlock) + 1;
+
+                do Memory.poke(curBlock, curSize);
+                do Memory.poke(curBlock+1, Memory.peek(nextBlock+1));
+            }
+        }
+
+        return;
     }    
 }
