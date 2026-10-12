@@ -35,9 +35,6 @@ class String {
      *  and initial length of 0. */
     constructor String new(int maxLength) {
 
-        // TODO: remove in final OS build
-        do String.init();
-
         let maxLen = maxLength;
         let curLen = 0;
         if (maxLen > 0) {
@@ -145,8 +142,8 @@ class String {
             return;
         }
 
-        while ((i > 0) & (newLen = 0)) {
-            if (absVal > pow10[i]) {
+        while (((i > 0) | (i = 0)) & (newLen = 0)) {
+            if ((absVal > pow10[i]) | (absVal = pow10[i])) {
                 let newLen = i + 1;
             } else {
                 let i = i - 1;
